@@ -169,62 +169,150 @@ func (b *BootSector) SetTotSec32(x uint32) {
 	b[32+3] = uint8(x >> 24)
 }
 
+func (b *BootSector) RawFatSz32() []byte {
+	return b[36 : 36+4]
+}
+
+func (b *BootSector) FatSz32() uint32 {
+	return uint32(b[36]) | (uint32(b[36+1]) << 8) |
+		(uint32(b[36+2]) << 16) | (uint32(b[36+3]) << 24)
+}
+
+func (b *BootSector) SetFatSz32(x uint32) {
+	b[36] = uint8(x)
+	b[36+1] = uint8(x >> 8)
+	b[36+2] = uint8(x >> 16)
+	b[36+3] = uint8(x >> 24)
+}
+
+func (b *BootSector) RawExtFlags() []byte {
+	return b[40 : 40+2]
+}
+
+func (b *BootSector) ExtFlags() uint16 {
+	return uint16(b[40]) | (uint16(b[40+1]) << 8)
+}
+
+func (b *BootSector) SetExtFlags(x uint16) {
+	b[40] = uint8(x)
+	b[40+1] = uint8(x >> 8)
+}
+
+func (b *BootSector) RawFSVer() []byte {
+	return b[42 : 42+2]
+}
+
+func (b *BootSector) FSVer() uint16 {
+	return uint16(b[42]) | (uint16(b[42+1]) << 8)
+}
+
+func (b *BootSector) SetFSVer(x uint16) {
+	b[42] = uint8(x)
+	b[42+1] = uint8(x >> 8)
+}
+
+func (b *BootSector) RawRootClus() []byte {
+	return b[44 : 44+4]
+}
+
+func (b *BootSector) RootClus() uint32 {
+	return uint32(b[44]) | (uint32(b[44+1]) << 8) |
+		(uint32(b[44+2]) << 16) | (uint32(b[44+3]) << 24)
+}
+
+func (b *BootSector) SetRootClus(x uint32) {
+	b[44] = uint8(x)
+	b[44+1] = uint8(x >> 8)
+	b[44+2] = uint8(x >> 16)
+	b[44+3] = uint8(x >> 24)
+}
+
+func (b *BootSector) RawFSInfo() []byte {
+	return b[48 : 48+2]
+}
+
+func (b *BootSector) FSInfo() uint16 {
+	return uint16(b[48]) | (uint16(b[48+1]) << 8)
+}
+
+func (b *BootSector) SetFSInfo(x uint16) {
+	b[48] = uint8(x)
+	b[48+1] = uint8(x >> 8)
+}
+
+func (b *BootSector) RawBkBootSec() []byte {
+	return b[50 : 50+2]
+}
+
+func (b *BootSector) BkBootSec() uint16 {
+	return uint16(b[50]) | (uint16(b[50+1]) << 8)
+}
+
+func (b *BootSector) SetBkBootSec(x uint16) {
+	b[50] = uint8(x)
+	b[50+1] = uint8(x >> 8)
+}
+
+func (b *BootSector) Reserved() []byte {
+	return b[52 : 52+12]
+}
+
 func (b *BootSector) RawDrvNum() []byte {
-	return b[36 : 36+1]
+	return b[64 : 64+1]
 }
 
 func (b *BootSector) DrvNum() uint8 {
-	return b[36]
+	return b[64]
 }
 
 func (b *BootSector) SetDrvNum(x uint8) {
-	b[36] = x
+	b[64] = x
 }
 
 func (b *BootSector) RawReserved1() []byte {
-	return b[37 : 37+1]
+	return b[65 : 65+1]
 }
 
 func (b *BootSector) Reserved1() uint8 {
-	return b[37]
+	return b[65]
 }
 
 func (b *BootSector) SetReserved1(x uint8) {
-	b[37] = x
+	b[65] = x
 }
 
 func (b *BootSector) RawBootSig() []byte {
-	return b[38 : 38+1]
+	return b[66 : 66+1]
 }
 
 func (b *BootSector) BootSig() uint8 {
-	return b[38]
+	return b[66]
 }
 
 func (b *BootSector) SetBootSig(x uint8) {
-	b[38] = x
+	b[66] = x
 }
 
 func (b *BootSector) RawVolID() []byte {
-	return b[39 : 39+4]
+	return b[67 : 67+4]
 }
 
 func (b *BootSector) VolID() uint32 {
-	return uint32(b[39]) | (uint32(b[39+1]) << 8) |
-		(uint32(b[39+2]) << 16) | (uint32(b[39+3]) << 24)
+	return uint32(b[67]) | (uint32(b[67+1]) << 8) |
+		(uint32(b[67+2]) << 16) | (uint32(b[67+3]) << 24)
 }
 
 func (b *BootSector) SetVolID(x uint32) {
-	b[39] = uint8(x)
-	b[39+1] = uint8(x >> 8)
-	b[39+2] = uint8(x >> 16)
-	b[39+3] = uint8(x >> 24)
+	b[67] = uint8(x)
+	b[67+1] = uint8(x >> 8)
+	b[67+2] = uint8(x >> 16)
+	b[67+3] = uint8(x >> 24)
 }
 
 func (b *BootSector) VolLab() []byte {
-	return b[43 : 43+11]
+	return b[71 : 71+11]
 }
 
 func (b *BootSector) FilSysType() []byte {
-	return b[54 : 54+8]
+	return b[82 : 82+8]
 }
