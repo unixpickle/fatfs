@@ -33,7 +33,7 @@ func NewBootSector32(volumeSize uint64, volumeLabel string) (*BootSector, error)
 	res.SetNumHeads(1)
 	res.SetHiddSec(0)
 	res.SetTotSec32(uint32(volumeSize / 512))
-	res.SetFatSz32(0) // TODO: this.
+	res.SetFatSz32(ceilDiv(res.TotSec32(), 512/4))
 	res.SetExtFlags(0)
 	res.SetFSVer(0)
 	res.SetRootClus(2)
@@ -362,4 +362,12 @@ func (b *BootSector) VolLab() []byte {
 
 func (b *BootSector) FilSysType() []byte {
 	return b[82 : 82+8]
+}
+
+func ceilDiv(num, denom uint32) uint32 {
+	if num%denom != 0 {
+		return num/denom + 1
+	} else {
+		return num / denom
+	}
 }
