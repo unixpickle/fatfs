@@ -13,6 +13,9 @@ type BootSector [512]byte
 // NewBootSector32 creates a BootSector for a new FAT32
 // file-system.
 func NewBootSector32(volumeSize uint64, volumeLabel string) (*BootSector, error) {
+	for len(volumeLabel) < 11 {
+		volumeLabel += " "
+	}
 	if volumeSize < 512*65525 {
 		return nil, errors.New("volume is too small")
 	} else if volumeSize >= 512*(1<<32) {
