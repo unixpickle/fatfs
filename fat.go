@@ -45,6 +45,7 @@ func FindFATSet(b *BootSector, d BlockDevice) FATSet {
 			Device: d,
 			Offset: offset,
 		})
+		offset += b.FatSz32()
 	}
 	return res
 }
