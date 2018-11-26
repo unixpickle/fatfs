@@ -154,6 +154,44 @@ func (c *Chain) Truncate() (err error) {
 	return nil
 }
 
+// ReadFrom takes all the data from r and writes it to the
+// end of the chain.
+//
+// Returns the number of bytes read from r before an error
+// was encountered.
+func (c *Chain) ReadFrom(r io.Reader) (n int64, err error) {
+	defer essentials.AddCtxTo("WriteFrom", &err)
+	if _, err := c.Seek(0, io.SeekEnd); err != nil {
+		return 0, err
+	}
+	needsExtend := false
+	for {
+		buffer := make([]byte, c.fs.ClusterSize())
+		m, readErr := io.ReadFull(r, buffer)
+		n += int64(m)
+		if readErr == io.EOF {
+			break
+		}
+
+		if needsExtend {
+			if err := c.Extend(); err != nil {
+				return n, err
+			}
+		}
+		needsExtend = true
+		if err := c.WriteCluster(buffer); err != nil {
+			return n, err
+		}
+
+		if readErr == io.ErrUnexpectedEOF {
+			break
+		} else if readErr != nil {
+			return n, readErr
+		}
+	}
+	return n, nil
+}
+
 func (c *Chain) clusterSector() uint32 {
 	b := c.fs.BootSector
 	firstData := uint32(b.RsvdSecCnt()) + uint32(b.NumFATs())*b.FatSz32()
