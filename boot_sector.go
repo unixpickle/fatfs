@@ -12,13 +12,13 @@ type BootSector Sector
 
 // NewBootSector32 creates a BootSector for a new FAT32
 // file-system.
-func NewBootSector32(volumeSize uint64, volumeLabel string) (*BootSector, error) {
+func NewBootSector32(numSectors uint32, volumeLabel string) (*BootSector, error) {
 	for len(volumeLabel) < 11 {
 		volumeLabel += " "
 	}
-	if volumeSize < SectorSize*65525 {
+	if numSectors < 8*65525 {
 		return nil, errors.New("volume is too small")
-	} else if volumeSize >= SectorSize*(1<<32) {
+	} else if numSectors >= (1<<32 - 1) {
 		return nil, errors.New("volume is too large")
 	}
 	res := new(BootSector)
@@ -35,7 +35,7 @@ func NewBootSector32(volumeSize uint64, volumeLabel string) (*BootSector, error)
 	res.SetSecPerTrk(1)
 	res.SetNumHeads(1)
 	res.SetHiddSec(0)
-	res.SetTotSec32(uint32(volumeSize / SectorSize))
+	res.SetTotSec32(numSectors)
 	res.SetFatSz32(ceilDiv(res.TotSec32(), 4096/4))
 	res.SetExtFlags(0)
 	res.SetFSVer(0)

@@ -31,6 +31,39 @@ func NewFS(b BlockDevice) (*FS, error) {
 	return fs, nil
 }
 
+// FormatFS creates a file-system by formatting the block
+// device. It is assumed that the device's contents is
+// initially zero'd out.
+func FormatFS(b BlockDevice, label string) (fs *FS, err error) {
+	defer essentials.AddCtxTo("FormatFS", &err)
+	bs, err := NewBootSector32(b.NumSectors(), label)
+	if err != nil {
+		return nil, err
+	}
+	sec := Sector(*bs)
+	if err := b.WriteSector(0, &sec); err != nil {
+		return nil, err
+	}
+	if err := b.WriteSector(1, fsInfoSector()); err != nil {
+		return nil, err
+	}
+	fs, err = NewFS(b)
+	if err != nil {
+		return nil, err
+	}
+
+	// First reserved cluster: 0x0FFFFF<MEDIA>
+	// Second reserved cluster: EOC
+	// Third cluster: EOC for root directory
+	for i := 0; i < 3; i++ {
+		if err := fs.WriteFAT(uint32(i), EOF); err != nil {
+			return nil, err
+		}
+	}
+
+	return fs, nil
+}
+
 // ClusterSize gets the number of bytes per cluster.
 func (f *FS) ClusterSize() int {
 	return int(f.BootSector.SecPerClus()) * SectorSize
@@ -99,4 +132,13 @@ func fatIndices(dataIndex uint32) (uint32, int) {
 	sector := dataIndex / 128
 	sectorIdx := dataIndex % 128
 	return sector, int(sectorIdx) * 4
+}
+
+func fsInfoSector() *Sector {
+	var res Sector
+	Endian.PutUint32(res[0:4], 0x41615252)
+	Endian.PutUint32(res[488:492], 0xffffffff)
+	Endian.PutUint32(res[492:496], 0xffffffff)
+	Endian.PutUint32(res[508:], 0xAA550000)
+	return &res
 }
