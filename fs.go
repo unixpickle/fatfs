@@ -73,7 +73,7 @@ func (f *FS) ClusterSize() int {
 func (f *FS) NumClusters() uint32 {
 	b := f.BootSector
 	numSectors := b.TotSec32() - (b.FatSz32()*uint32(b.NumFATs()) + uint32(b.RsvdSecCnt()))
-	return numSectors / uint32(b.SecPerClus())
+	return 2 + numSectors/uint32(b.SecPerClus())
 }
 
 // ReadFAT reads a FAT entry.
