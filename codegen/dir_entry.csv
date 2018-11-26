@@ -1,0 +1,11 @@
+Name,0,11
+Attr,11,1
+CrtTimeTenth,13,1
+CrtTime,14,2
+CrtDate,16,2
+LstAccDate,18,2
+FstClusHI,20,2
+WrtTime,22,2
+WrtDate,24,2
+FstClusLO,26,2
+FileSize,28,4
