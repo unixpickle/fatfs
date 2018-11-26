@@ -21,7 +21,7 @@ const (
 // about a file.
 func NewDirEntry(name string, cluster, size uint32, creation time.Time, isDir bool) *DirEntry {
 	var res DirEntry
-	copy(res.Name(), []byte(formatName(name)))
+	copy(res.Name(), []byte(FormatName(name)))
 	res.SetFstClusLO(uint16(cluster))
 	res.SetFstClusHI(uint16(cluster >> 16))
 	res.SetFileSize(size)
@@ -46,7 +46,9 @@ func (d *DirEntry) IsLongName() bool {
 	return d.Attr()&0x3f == LongName
 }
 
-func formatName(name string) string {
+// FormatName turns a regular filename, like "foo.txt",
+// into a string like "FOO     TXT".
+func FormatName(name string) string {
 	name = strings.ToUpper(name)
 	prefix := name
 	ext := path.Ext(name)

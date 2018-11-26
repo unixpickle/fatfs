@@ -35,12 +35,3 @@ func createFileCluster(fs *fatfs.FS) (uint32, uint32) {
 
 	return fileCluster, uint32(size)
 }
-
-func createDirEntry(fileChunk uint32, fileSize uint32) *fatfs.DirEntry {
-	var res fatfs.DirEntry
-	copy(res.Name(), []byte("EXAMPLE JPG"))
-	res.SetFstClusLO(uint16(fileChunk))
-	res.SetFstClusHI(uint16(fileChunk >> 16))
-	res.SetFileSize(uint32(fileSize))
-	return &res
-}
