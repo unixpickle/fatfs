@@ -1,6 +1,7 @@
 package fatfs
 
 import (
+	"errors"
 	"io"
 
 	"github.com/unixpickle/essentials"
@@ -94,4 +95,33 @@ func (d *Dir) AddEntry(newEntry *DirEntry) (err error) {
 	cluster := make([]byte, d.chain.fs.ClusterSize())
 	copy(cluster, newEntry[:])
 	return d.chain.WriteCluster(cluster)
+}
+
+// RemoveEntry deletes the entry for the given name.
+func (d *Dir) RemoveEntry(name string) (err error) {
+	defer essentials.AddCtxTo("RemoveEntry", &err)
+	if err := d.Reset(); err != nil {
+		return err
+	}
+	for offset := int64(0); true; offset += 1 {
+		cluster, err := d.chain.ReadCluster()
+		if err != nil {
+			return err
+		}
+		for i := 0; i < len(cluster); i += 32 {
+			var entry DirEntry
+			copy(entry[:], cluster[i:])
+			if string(entry.Name()) == name {
+				entry.Name()[0] = 0xe5
+				copy(cluster[i:], entry[:])
+				return d.chain.WriteCluster(cluster)
+			}
+		}
+		if newOffset, err := d.chain.Seek(1, io.SeekCurrent); err != nil {
+			return err
+		} else if newOffset == offset {
+			return errors.New("file not found")
+		}
+	}
+	panic("unreachable")
 }
