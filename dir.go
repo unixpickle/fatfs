@@ -12,6 +12,12 @@ type Dir struct {
 	atEOF bool
 }
 
+// NewDir creates a Dir from a Chain.
+// The Chain must be seeked to the start.
+func NewDir(c *Chain) *Dir {
+	return &Dir{chain: c}
+}
+
 // Reset seeks to the beginning of the listing.
 func (d *Dir) Reset() error {
 	_, err := d.chain.Seek(0, io.SeekStart)
