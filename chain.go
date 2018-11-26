@@ -27,6 +27,11 @@ func NewChain(fs *FS, start uint32) *Chain {
 	return &Chain{fs: fs, cluster: start}
 }
 
+// RootDirChain gets a Chain for the root directory.
+func RootDirChain(fs *FS) *Chain {
+	return NewChain(fs, fs.BootSector.RootClus())
+}
+
 // ReadCluster reads the current cluster of the Chain.
 func (c *Chain) ReadCluster() ([]byte, error) {
 	res := make([]byte, 0, c.fs.ClusterSize())
