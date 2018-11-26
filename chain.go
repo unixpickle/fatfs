@@ -32,6 +32,20 @@ func RootDirChain(fs *FS) *Chain {
 	return NewChain(fs, fs.BootSector.RootClus())
 }
 
+// FS gets the underlying file-system.
+func (c *Chain) FS() *FS {
+	return c.fs
+}
+
+// FirstCluster gets the first cluster of the Chain.
+func (c *Chain) FirstCluster() uint32 {
+	if len(c.prev) > 0 {
+		return c.prev[0]
+	} else {
+		return c.cluster
+	}
+}
+
 // ReadCluster reads the current cluster of the Chain.
 func (c *Chain) ReadCluster() ([]byte, error) {
 	res := make([]byte, 0, c.fs.ClusterSize())

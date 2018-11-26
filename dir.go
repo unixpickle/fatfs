@@ -9,20 +9,20 @@ import (
 
 // A Dir is an open handle to a directory.
 type Dir struct {
-	chain *Chain
+	Chain *Chain
 }
 
 // NewDir creates a Dir from a Chain.
 // The Chain must be seeked to the start.
 func NewDir(c *Chain) *Dir {
-	return &Dir{chain: c}
+	return &Dir{Chain: c}
 }
 
 // ReadDir reads the directory listings.
 func (d *Dir) ReadDir() (entries []*DirEntry, err error) {
 	defer essentials.AddCtxTo("ReadDir", &err)
 	_, err = d.loopClusters(func() (bool, error) {
-		cluster, err := d.chain.ReadCluster()
+		cluster, err := d.Chain.ReadCluster()
 		if err != nil {
 			return false, err
 		}
@@ -47,7 +47,7 @@ func (d *Dir) AddEntry(newEntry *DirEntry) (err error) {
 	defer essentials.AddCtxTo("AddEntry", &err)
 
 	added, err := d.loopClusters(func() (bool, error) {
-		cluster, err := d.chain.ReadCluster()
+		cluster, err := d.Chain.ReadCluster()
 		if err != nil {
 			return false, err
 		}
@@ -56,7 +56,7 @@ func (d *Dir) AddEntry(newEntry *DirEntry) (err error) {
 			copy(entry[:], cluster[i:])
 			if entry.IsFree() {
 				copy(cluster[i:], newEntry[:])
-				return true, d.chain.WriteCluster(cluster)
+				return true, d.Chain.WriteCluster(cluster)
 			}
 		}
 		return false, nil
@@ -67,18 +67,18 @@ func (d *Dir) AddEntry(newEntry *DirEntry) (err error) {
 	}
 
 	// Create a new cluster of listings.
-	if err := d.chain.Extend(); err != nil {
+	if err := d.Chain.Extend(); err != nil {
 		return err
 	}
-	cluster := make([]byte, d.chain.fs.ClusterSize())
+	cluster := make([]byte, d.Chain.fs.ClusterSize())
 	copy(cluster, newEntry[:])
-	return d.chain.WriteCluster(cluster)
+	return d.Chain.WriteCluster(cluster)
 }
 
 // RemoveEntry deletes the entry for the given name.
 func (d *Dir) RemoveEntry(name string) error {
 	found, err := d.loopClusters(func() (bool, error) {
-		cluster, err := d.chain.ReadCluster()
+		cluster, err := d.Chain.ReadCluster()
 		if err != nil {
 			return false, err
 		}
@@ -88,7 +88,7 @@ func (d *Dir) RemoveEntry(name string) error {
 			if string(entry.Name()) == name {
 				entry.Name()[0] = 0xe5
 				copy(cluster[i:], entry[:])
-				return true, d.chain.WriteCluster(cluster)
+				return true, d.Chain.WriteCluster(cluster)
 			}
 		}
 		return false, nil
@@ -100,7 +100,7 @@ func (d *Dir) RemoveEntry(name string) error {
 }
 
 func (d *Dir) loopClusters(f func() (done bool, err error)) (bool, error) {
-	if _, err := d.chain.Seek(0, io.SeekStart); err != nil {
+	if _, err := d.Chain.Seek(0, io.SeekStart); err != nil {
 		return false, err
 	}
 	for offset := int64(0); true; offset += 1 {
@@ -109,7 +109,7 @@ func (d *Dir) loopClusters(f func() (done bool, err error)) (bool, error) {
 		} else if done {
 			return true, nil
 		}
-		if newOffset, err := d.chain.Seek(1, io.SeekCurrent); err != nil {
+		if newOffset, err := d.Chain.Seek(1, io.SeekCurrent); err != nil {
 			return false, err
 		} else if newOffset == offset {
 			break
