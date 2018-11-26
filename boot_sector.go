@@ -8,7 +8,7 @@ import (
 
 // BootSector contains the data in the first sector of the
 // volume.
-type BootSector [512]byte
+type BootSector Sector
 
 // NewBootSector32 creates a BootSector for a new FAT32
 // file-system.
@@ -16,15 +16,15 @@ func NewBootSector32(volumeSize uint64, volumeLabel string) (*BootSector, error)
 	for len(volumeLabel) < 11 {
 		volumeLabel += " "
 	}
-	if volumeSize < 512*65525 {
+	if volumeSize < SectorSize*65525 {
 		return nil, errors.New("volume is too small")
-	} else if volumeSize >= 512*(1<<32) {
+	} else if volumeSize >= SectorSize*(1<<32) {
 		return nil, errors.New("volume is too large")
 	}
 	res := new(BootSector)
 	copy(res.BootJump(), []byte{0xeb, 0, 0x90})
 	copy(res.OEMName(), []byte("MSWIN4.1"))
-	res.SetBytesPerSec(512)
+	res.SetBytesPerSec(SectorSize)
 	res.SetSecPerClus(8)
 	res.SetRsvdSecCnt(2)
 	res.SetNumFATs(2)
@@ -35,7 +35,7 @@ func NewBootSector32(volumeSize uint64, volumeLabel string) (*BootSector, error)
 	res.SetSecPerTrk(1)
 	res.SetNumHeads(1)
 	res.SetHiddSec(0)
-	res.SetTotSec32(uint32(volumeSize / 512))
+	res.SetTotSec32(uint32(volumeSize / SectorSize))
 	res.SetFatSz32(ceilDiv(res.TotSec32(), 4096/4))
 	res.SetExtFlags(0)
 	res.SetFSVer(0)

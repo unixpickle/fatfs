@@ -1,6 +1,8 @@
 package fatfs
 
-type Sector [512]byte
+const SectorSize = 512
+
+type Sector [SectorSize]byte
 
 // A BlockDevice is a raw interface for reading and
 // writing blocks of data.
