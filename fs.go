@@ -71,3 +71,32 @@ func (f *FS) WriteFAT(dataIndex uint32, contents uint32) error {
 	}
 	return nil
 }
+
+// Alloc allocates a cluster and marks it with an EOF in
+// the FAT.
+func (f *FS) Alloc() (dataIndex uint32, err error) {
+	defer essentials.AddCtxTo("Alloc", &err)
+	for i := uint32(0); i < f.BootSector.FatSz32(); i++ {
+		block, err := f.Device.ReadSector(i + f.fatSectors[0])
+		if err != nil {
+			return 0, err
+		}
+		for j := 0; j < 128; j++ {
+			clusterIdx := uint32(j) + i*128
+			if clusterIdx < 2 || clusterIdx >= f.NumClusters() {
+				continue
+			}
+			contents := Endian.Uint32(block[j*4:(j+1)*4]) & 0x0fffffff
+			if contents == 0 {
+				return clusterIdx, f.WriteFAT(clusterIdx, EOF)
+			}
+		}
+	}
+	return 0, errors.New("no free clusters")
+}
+
+func fatIndices(dataIndex uint32) (uint32, int) {
+	sector := dataIndex / 128
+	sectorIdx := dataIndex % 128
+	return sector, int(sectorIdx) * 4
+}
