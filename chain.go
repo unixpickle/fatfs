@@ -168,6 +168,26 @@ func (c *Chain) Truncate() (err error) {
 	return nil
 }
 
+// Free releases all of the data used by the Chain.
+// The Chain should not be used after calling Free.
+func (c *Chain) Free() (err error) {
+	defer essentials.AddCtxTo("Free", &err)
+	if _, err := c.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+	for c.cluster < EOF {
+		next, err := c.fs.ReadFAT(c.cluster)
+		if err != nil {
+			return err
+		}
+		if err := c.fs.WriteFAT(c.cluster, 0); err != nil {
+			return err
+		}
+		c.cluster = next
+	}
+	return nil
+}
+
 // ReadFrom takes all the data from r and writes it to the
 // end of the chain.
 //

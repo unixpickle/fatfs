@@ -102,6 +102,36 @@ func TestChainTrunc(t *testing.T) {
 	verifyCluster(t, chain)
 }
 
+func TestChainFree(t *testing.T) {
+	dev := make(RAMDisk, 4096*80000)
+	fs, err := FormatFS(dev, "FOO")
+	if err != nil {
+		t.Fatal(err)
+	}
+	chain := RootDirChain(fs)
+	for i := 0; i < 4; i++ {
+		if err := chain.Extend(); err != nil {
+			t.Fatal(err)
+		}
+		verifyCluster(t, chain)
+	}
+	if err := chain.Free(); err != nil {
+		t.Fatal(err)
+	}
+	cluster, err := fs.Alloc()
+	if err != nil {
+		t.Fatal(err)
+	}
+	chain = NewChain(fs, cluster)
+	verifyCluster(t, chain)
+	for i := 0; i < 4; i++ {
+		if err := chain.Extend(); err != nil {
+			t.Fatal(err)
+		}
+		verifyCluster(t, chain)
+	}
+}
+
 func verifyCluster(t *testing.T, c *Chain) {
 	expected := uint32(len(c.prev) + 2)
 	if c.cluster != expected {
