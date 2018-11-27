@@ -1,6 +1,8 @@
 package fatfs
 
-import "time"
+import (
+	"time"
+)
 
 // A DirEntry is a directory entry that potentially has a
 // long name.
@@ -33,6 +35,23 @@ func (d DirEntry) Name() string {
 	if len(d) == 1 {
 		return UnformatName(string(d[0].Name()))
 	}
-	// TODO: assemble the name here.
-	panic("not yet implemented")
+	var runes []rune
+	for i := len(d) - 2; i >= 0; i-- {
+		runes = append(runes, unpackLongEntry(d[i])...)
+	}
+	return string(runes)
+}
+
+func unpackLongEntry(raw *RawDirEntry) []rune {
+	var res []rune
+	for _, byteRange := range [][2]int{{1, 11}, {14, 26}, {28, 32}} {
+		for i := byteRange[0]; i < byteRange[1]; i += 2 {
+			word := Endian.Uint16(raw[i : i+2])
+			if word == 0 {
+				return res
+			}
+			res = append(res, rune(word))
+		}
+	}
+	return res
 }
