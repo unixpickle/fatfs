@@ -71,6 +71,19 @@ func FormatName(name string) string {
 	return prefix + ext
 }
 
+// UnformatName turns a filename like "FOO     TXT" into a
+// normal name like "FOO.TXT".
+func UnformatName(name string) string {
+	if len(name) != 11 {
+		panic("invalid name")
+	}
+	if name[8:] == "   " {
+		return strings.TrimRight(name[:8], " ")
+	} else {
+		return strings.TrimRight(name[:8], " ") + "." + strings.TrimRight(name[8:], " ")
+	}
+}
+
 func spacePad(str string, length int) string {
 	if len(str) > length {
 		return str[:length]
