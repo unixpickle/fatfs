@@ -25,7 +25,7 @@ func TestRemove(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	newDir.AddRawEntry(NewRawDirEntry("FOO     TXT", cluster, 13, time.Now(), false))
+	newDir.AddEntry(NewDirEntry("FOO.TXT", cluster, 13, time.Now(), false))
 
 	if err := Remove(dir, "DIR"); err != nil {
 		t.Fatal(err)

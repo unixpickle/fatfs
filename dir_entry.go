@@ -1,12 +1,19 @@
 package fatfs
 
+import "time"
+
 // A DirEntry is a directory entry that potentially has a
 // long name.
 type DirEntry []*RawDirEntry
 
 // NewDirEntry creates a DirEntry using a long name and
 // a pre-existing raw entry.
-func NewDirEntry(short *RawDirEntry, name string) DirEntry {
+func NewDirEntry(name string, cluster, size uint32, date time.Time, dir bool) DirEntry {
+	return WrapDirEntry(name, NewRawDirEntry(FormatName(name), cluster, size, date, dir))
+}
+
+// WrapDirEntry creates a DirEntry around a RawDirEntry.
+func WrapDirEntry(name string, short *RawDirEntry) DirEntry {
 	if name == UnformatName(string(short.Name())) {
 		return DirEntry{short}
 	}

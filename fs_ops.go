@@ -24,8 +24,7 @@ func Mkdir(parent *Dir, name string, date time.Time) (d *Dir, err error) {
 		return nil, err
 	}
 
-	short := NewRawDirEntry(FormatName(name), dirCluster, 0, date, true)
-	entry := NewDirEntry(short, name)
+	entry := NewDirEntry(name, dirCluster, 0, date, true)
 	if err := parent.AddEntry(entry); err != nil {
 		fs.WriteFAT(dirCluster, 0)
 		return nil, err
