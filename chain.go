@@ -226,6 +226,31 @@ func (c *Chain) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, nil
 }
 
+// WriteTo writes the entire chain to w.
+func (c *Chain) WriteTo(w io.Writer) (n int64, err error) {
+	defer essentials.AddCtxTo("WriteTo", &err)
+	if _, err := c.Seek(0, io.SeekStart); err != nil {
+		return 0, err
+	}
+	for offset := int64(0); true; offset++ {
+		cluster, err := c.ReadCluster()
+		if err != nil {
+			return n, err
+		}
+		m, err := w.Write(cluster)
+		n += int64(m)
+		if err != nil {
+			return n, err
+		}
+		if newOffset, err := c.Seek(1, io.SeekCurrent); err != nil {
+			return n, err
+		} else if newOffset == offset {
+			break
+		}
+	}
+	return
+}
+
 func (c *Chain) clusterSector() uint32 {
 	b := c.fs.BootSector
 	firstData := uint32(b.RsvdSecCnt()) + uint32(b.NumFATs())*b.FatSz32()
