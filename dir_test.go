@@ -18,7 +18,7 @@ func TestAddEntry(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		dir.AddEntry(NewDirEntry(fmt.Sprintf("%d.txt", i), contents, uint32(i%15),
+		dir.AddEntry(NewDirEntry(FormatName(fmt.Sprintf("%d.txt", i)), contents, uint32(i%15),
 			time.Now(), false))
 	}
 	listings, err := dir.ReadDir()
@@ -48,7 +48,7 @@ func TestRemoveEntry(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		dir.AddEntry(NewDirEntry(fmt.Sprintf("%d.txt", i), contents, uint32(i%15),
+		dir.AddEntry(NewDirEntry(FormatName(fmt.Sprintf("%d.txt", i)), contents, uint32(i%15),
 			time.Now(), false))
 	}
 	if _, err := dir.RemoveEntry(FormatName("123.txt")); err != nil {

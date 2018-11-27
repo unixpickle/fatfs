@@ -19,9 +19,14 @@ const (
 
 // NewDirEntry creates a DirEntry given some meta-data
 // about a file.
+//
+// The name must be formatted with FormatName().
 func NewDirEntry(name string, cluster, size uint32, creation time.Time, isDir bool) *DirEntry {
+	if len(name) != 11 {
+		panic("invalid name argument")
+	}
 	var res DirEntry
-	copy(res.Name(), []byte(FormatName(name)))
+	copy(res.Name(), []byte(name))
 	res.SetFstClusLO(uint16(cluster))
 	res.SetFstClusHI(uint16(cluster >> 16))
 	res.SetFileSize(size)

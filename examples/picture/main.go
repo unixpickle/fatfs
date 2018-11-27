@@ -18,7 +18,8 @@ func main() {
 	rootDir := fatfs.NewDir(fatfs.RootDirChain(fs))
 	subDir, err := fatfs.Mkdir(rootDir, "photos", time.Now())
 	essentials.Must(err)
-	subDir.AddEntry(fatfs.NewDirEntry("example.jpg", fileCluster, fileSize, time.Now(), false))
+	subDir.AddEntry(fatfs.NewDirEntry(fatfs.FormatName("example.jpg"), fileCluster, fileSize,
+		time.Now(), false))
 
 	ioutil.WriteFile("disk.img", dev, 0755)
 }
