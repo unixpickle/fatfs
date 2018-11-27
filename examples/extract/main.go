@@ -38,13 +38,12 @@ func extractDirectory(dest string, source *fatfs.Dir) {
 	listing, err := source.ReadDir()
 	essentials.Must(err)
 	for _, entry := range listing {
-		if entry.IsDotPointer() {
+		if entry.Raw().IsDotPointer() {
 			continue
 		}
-		outName := fatfs.UnformatName(string(entry.Name()))
-		chain := fatfs.NewChain(source.Chain.FS(), entry.FirstCluster())
-		filePath := filepath.Join(dest, outName)
-		if entry.Attr()&fatfs.Directory == fatfs.Directory {
+		chain := fatfs.NewChain(source.Chain.FS(), entry.Raw().FirstCluster())
+		filePath := filepath.Join(dest, entry.Name())
+		if entry.Raw().Attr()&fatfs.Directory == fatfs.Directory {
 			essentials.Must(os.Mkdir(filePath, 0755))
 			extractDirectory(filePath, fatfs.NewDir(chain))
 		} else {
@@ -52,7 +51,7 @@ func extractDirectory(dest string, source *fatfs.Dir) {
 			essentials.Must(err)
 			_, err = chain.WriteTo(f)
 			essentials.Must(err)
-			f.Truncate(int64(entry.FileSize()))
+			f.Truncate(int64(entry.Raw().FileSize()))
 			f.Close()
 		}
 	}

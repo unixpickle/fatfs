@@ -13,7 +13,7 @@ import (
 
 func main() {
 	generateDataType("codegen/boot_sector.csv", "boot_sector_gen.go", "BootSector", "Sector")
-	generateDataType("codegen/dir_entry.csv", "dir_entry_gen.go", "DirEntry", "[32]byte")
+	generateDataType("codegen/raw_dir_entry.csv", "raw_dir_entry_gen.go", "RawDirEntry", "[32]byte")
 }
 
 func generateDataType(csvFile, outputFile, className, definition string) {

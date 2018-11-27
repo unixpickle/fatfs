@@ -251,6 +251,68 @@ func (c *Chain) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
+// ReadNext reads the current cluster and advances to the
+// next cluster.
+//
+// Sets done to true if this is the last cluster.
+func (c *Chain) ReadNext() (data []byte, done bool, err error) {
+	data, err = c.ReadCluster()
+	if err != nil {
+		return
+	}
+	offset, err := c.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return
+	}
+	newOffset, err := c.Seek(1, io.SeekCurrent)
+	if err != nil {
+		return
+	}
+	done = newOffset == offset
+	return
+}
+
+// SetClusters sets the chain's contents to an exact
+// sequence of clusters.
+// Expands or truncates the chain as necessary.
+//
+// You must pass at least one cluster.
+func (c *Chain) SetClusters(clusters [][]byte) (err error) {
+	defer essentials.AddCtxTo("SetClusters", &err)
+	if len(clusters) == 0 {
+		panic("must write at least one cluster")
+	}
+	length, err := c.Seek(0, io.SeekEnd)
+	if err != nil {
+		return err
+	}
+	length++
+	for length < int64(len(clusters)) {
+		if err := c.Extend(); err != nil {
+			return err
+		}
+		length++
+	}
+	for length > int64(len(clusters)) {
+		if err := c.Truncate(); err != nil {
+			return err
+		}
+		length--
+	}
+	if _, err := c.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+	for _, cluster := range clusters {
+		if err := c.WriteCluster(cluster); err != nil {
+			return err
+		}
+		if _, err := c.Seek(1, io.SeekCurrent); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (c *Chain) clusterSector() uint32 {
 	b := c.fs.BootSector
 	firstData := uint32(b.RsvdSecCnt()) + uint32(b.NumFATs())*b.FatSz32()

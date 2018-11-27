@@ -12,11 +12,11 @@ func TestRemove(t *testing.T) {
 		t.Fatal(err)
 	}
 	dir := NewDir(RootDirChain(fs))
-	newDir, err := Mkdir(dir, "DIR        ", time.Now())
+	newDir, err := Mkdir(dir, "DIR", time.Now())
 	if err != nil {
 		t.Fatal(err)
 	}
-	newDir, err = Mkdir(newDir, "SUBDIR     ", time.Now())
+	newDir, err = Mkdir(newDir, "SUBDIR", time.Now())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,9 +25,9 @@ func TestRemove(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	newDir.AddEntry(NewDirEntry("FOO     TXT", cluster, 13, time.Now(), false))
+	newDir.AddRawEntry(NewRawDirEntry("FOO     TXT", cluster, 13, time.Now(), false))
 
-	if err := Remove(dir, "DIR        "); err != nil {
+	if err := Remove(dir, "DIR"); err != nil {
 		t.Fatal(err)
 	}
 
