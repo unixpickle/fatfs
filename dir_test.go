@@ -51,10 +51,10 @@ func TestRemoveEntry(t *testing.T) {
 		dir.AddEntry(NewDirEntry(fmt.Sprintf("%d.txt", i), contents, uint32(i%15),
 			time.Now(), false))
 	}
-	if err := dir.RemoveEntry(FormatName("123.txt")); err != nil {
+	if _, err := dir.RemoveEntry(FormatName("123.txt")); err != nil {
 		t.Fatal(err)
 	}
-	if err := dir.RemoveEntry(FormatName("123.txt")); err == nil {
+	if _, err := dir.RemoveEntry(FormatName("123.txt")); err == nil {
 		t.Fatal(err)
 	}
 	listings, err := dir.ReadDir()

@@ -76,14 +76,14 @@ func (d *Dir) AddEntry(newEntry *DirEntry) (err error) {
 }
 
 // RemoveEntry deletes the entry for the given name.
-func (d *Dir) RemoveEntry(name string) error {
+func (d *Dir) RemoveEntry(name string) (*DirEntry, error) {
+	var entry DirEntry
 	found, err := d.loopClusters(func() (bool, error) {
 		cluster, err := d.Chain.ReadCluster()
 		if err != nil {
 			return false, err
 		}
 		for i := 0; i < len(cluster); i += 32 {
-			var entry DirEntry
 			copy(entry[:], cluster[i:])
 			if string(entry.Name()) == name {
 				entry.Name()[0] = 0xe5
@@ -96,7 +96,11 @@ func (d *Dir) RemoveEntry(name string) error {
 	if err == nil && !found {
 		err = errors.New("file not found")
 	}
-	return essentials.AddCtx("RemoveEntry", err)
+	if err == nil {
+		return &entry, nil
+	} else {
+		return nil, essentials.AddCtx("RemoveEntry", err)
+	}
 }
 
 func (d *Dir) loopClusters(f func() (done bool, err error)) (bool, error) {

@@ -28,3 +28,25 @@ func Mkdir(parent *Dir, name string, date time.Time) (d *Dir, err error) {
 
 	return NewDir(NewChain(fs, dirCluster)), nil
 }
+
+// Remove deletes a file or directory.
+// It uses recursion if necessary.
+func Remove(parent *Dir, name string) (err error) {
+	defer essentials.AddCtxTo("Unlink", &err)
+	entry, err := parent.RemoveEntry(name)
+	if err != nil {
+		return err
+	}
+	chain := NewChain(parent.Chain.FS(), entry.FirstCluster())
+	if entry.Attr()&Directory == Directory {
+		dir := NewDir(chain)
+		listing, err := dir.ReadDir()
+		if err != nil {
+			return err
+		}
+		for _, entry := range listing {
+			Remove(dir, string(entry.Name()))
+		}
+	}
+	return chain.Free()
+}

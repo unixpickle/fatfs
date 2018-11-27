@@ -36,6 +36,11 @@ func NewDirEntry(name string, cluster, size uint32, creation time.Time, isDir bo
 	return &res
 }
 
+// FirstCluster gets the first cluster of the file.
+func (d *DirEntry) FirstCluster() uint32 {
+	return uint32(d.FstClusLO()) | (uint32(d.FstClusHI()) << 16)
+}
+
 // IsFree checks if the directory entry is a free slot.
 func (d *DirEntry) IsFree() bool {
 	return d.Name()[0] == 0 || d.Name()[0] == 0xe5
