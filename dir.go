@@ -29,7 +29,7 @@ func (d *Dir) ReadDir() (entries []*DirEntry, err error) {
 		for i := 0; i < len(cluster); i += 32 {
 			var entry DirEntry
 			copy(entry[:], cluster[i:])
-			if !entry.IsFree() {
+			if !entry.IsFree() && !entry.IsLongName() {
 				entries = append(entries, &entry)
 			}
 		}
