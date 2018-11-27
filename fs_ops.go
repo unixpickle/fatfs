@@ -45,7 +45,9 @@ func Remove(parent *Dir, name string) (err error) {
 			return err
 		}
 		for _, entry := range listing {
-			Remove(dir, string(entry.Name()))
+			if !entry.IsDotPointer() {
+				Remove(dir, string(entry.Name()))
+			}
 		}
 	}
 	return chain.Free()
