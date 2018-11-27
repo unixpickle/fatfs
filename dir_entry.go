@@ -56,6 +56,11 @@ func (d *DirEntry) IsLongName() bool {
 	return d.Attr()&0x3f == LongName
 }
 
+// IsDotPointer checks if this is "." or "..".
+func (d *DirEntry) IsDotPointer() bool {
+	return string(d.Name()) == ".          " || string(d.Name()) == "..         "
+}
+
 // FormatName turns a regular filename, like "foo.txt",
 // into a string like "FOO     TXT".
 func FormatName(name string) string {

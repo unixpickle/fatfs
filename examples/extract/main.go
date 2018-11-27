@@ -38,7 +38,7 @@ func extractDirectory(dest string, source *fatfs.Dir) {
 	listing, err := source.ReadDir()
 	essentials.Must(err)
 	for _, entry := range listing {
-		if string(entry.Name()) == ".          " || string(entry.Name()) == "..         " {
+		if entry.IsDotPointer() {
 			continue
 		}
 		outName := fatfs.UnformatName(string(entry.Name()))
