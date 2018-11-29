@@ -7,7 +7,7 @@ import (
 
 func TestChainExtend(t *testing.T) {
 	dev := make(RAMDisk, 4096*80000)
-	fs, err := FormatFS(dev, "FOO")
+	fs, err := FormatFS(dev, "FOO", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func TestChainExtend(t *testing.T) {
 
 func TestChainSeek(t *testing.T) {
 	dev := make(RAMDisk, 4096*80000)
-	fs, err := FormatFS(dev, "FOO")
+	fs, err := FormatFS(dev, "FOO", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func TestChainSeek(t *testing.T) {
 
 func TestChainTrunc(t *testing.T) {
 	dev := make(RAMDisk, 4096*80000)
-	fs, err := FormatFS(dev, "FOO")
+	fs, err := FormatFS(dev, "FOO", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func TestChainTrunc(t *testing.T) {
 
 func TestChainFree(t *testing.T) {
 	dev := make(RAMDisk, 4096*80000)
-	fs, err := FormatFS(dev, "FOO")
+	fs, err := FormatFS(dev, "FOO", false)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -7,7 +7,7 @@ import (
 
 func TestRemove(t *testing.T) {
 	dev := make(RAMDisk, 4096*80000)
-	fs, err := FormatFS(dev, "FOO")
+	fs, err := FormatFS(dev, "FOO", false)
 	if err != nil {
 		t.Fatal(err)
 	}

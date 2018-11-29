@@ -32,15 +32,27 @@ func NewFS(b BlockDevice) (*FS, error) {
 }
 
 // FormatFS creates a file-system by formatting the block
-// device. It is assumed that the device's contents is
-// initially zero'd out.
-func FormatFS(b BlockDevice, label string) (fs *FS, err error) {
+// device.
+//
+// If erase is false, then it is assumed that all the data
+// on the device was already zeroes.
+func FormatFS(b BlockDevice, label string, erase bool) (fs *FS, err error) {
 	defer essentials.AddCtxTo("FormatFS", &err)
 	bs, err := NewBootSector32(b.NumSectors(), label)
 	if err != nil {
 		return nil, err
 	}
-	sec := Sector(*bs)
+
+	var sec Sector
+	if erase {
+		for i := 0; i < int(bs.RsvdSecCnt())+2*int(bs.FatSz32()); i++ {
+			if err := b.WriteSector(uint32(i), &sec); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	sec = Sector(*bs)
 	if err := b.WriteSector(0, &sec); err != nil {
 		return nil, err
 	}

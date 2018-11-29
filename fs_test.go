@@ -6,7 +6,7 @@ import (
 
 func TestFormatFS(t *testing.T) {
 	dev := make(RAMDisk, 4096*80000)
-	_, err := FormatFS(dev, "FOO")
+	_, err := FormatFS(dev, "FOO", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -14,7 +14,7 @@ func TestFormatFS(t *testing.T) {
 
 func TestAlloc(t *testing.T) {
 	dev := make(RAMDisk, 4096*80000)
-	fs, err := FormatFS(dev, "FOO")
+	fs, err := FormatFS(dev, "FOO", false)
 	if err != nil {
 		t.Fatal(err)
 	}

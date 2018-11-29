@@ -11,7 +11,7 @@ import (
 
 func main() {
 	dev := make(fatfs.RAMDisk, 299999744)
-	fs, err := fatfs.FormatFS(dev, "TEST")
+	fs, err := fatfs.FormatFS(dev, "TEST", false)
 	essentials.Must(err)
 
 	fileCluster, fileSize := createFileCluster(fs)
